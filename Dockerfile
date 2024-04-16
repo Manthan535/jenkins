@@ -1,2 +1,2 @@
 FROM httpd
-COPY index.html /home/manthan/.jenkins/workspace/build_image
+COPY index.html /usr/local/apache2/htdocs/
