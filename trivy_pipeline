@@ -1,3 +1,20 @@
+###Trivy installation 
+sudo rpm --import https://aquasecurity.github.io/trivy-repo/rpm/public.key
+
+sudo cat << 'EOF' > /etc/yum.repos.d/trivy.repo
+[trivy]
+name=Trivy Repository
+baseurl=https://aquasecurity.github.io/trivy-repo/rpm/releases/$basearch/
+gpgcheck=1
+enabled=1
+EOF
+
+sudo dnf install -y trivy
+
+
+
+
+######Start Groovy Language
 pipeline {
     agent any
 
