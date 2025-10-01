@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    stages {
+        
+        stage('remove existing docker images'){
+            steps{
+                sh 'docker stop myapp_container || true'
+                sh 'docker rm myapp_container || true'
+            }
+        }
+
+        stage('Clone from GitHub') {
+            steps {
+                git branch: 'main', url: 'https://github.com/{Enter_git_URL}.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t myapp:latest .'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh 'docker run -d --name myapp_container -p 8081:80 myapp:latest'
+            }
+        }
+
+        stage('Linux Commands') {
+            steps {
+                sh '''
+                    echo "Listing files..."
+                    ls -l
+                    echo "Checking Docker containers..."
+                    docker ps
+                '''
+            }
+        }
+
+        stage('Deploy Complete') {
+            steps {
+                echo "Deployment Successful!"
+            }
+        }
+         stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy image --exit-code 1 --severity HIGH,CRITICAL myapp:latest
+                '''
+            }
+        }
+    }
+    post {
+        failure {
+            echo "❌ Vulnerabilities found! Build failed."
+        }
+        success {
+            echo "✅ No high-risk vulnerabilities."
+        }
+        }
+}
+
